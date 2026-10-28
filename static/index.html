@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faceit Analytics — аналитика CS2 игроков</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" />
+</head>
+<body>
+  <!-- ======================= ШАПКА ======================= -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo" data-nav="home">
+        <span class="logo-mark">FA</span>
+        <span class="logo-text">Faceit <b>Analytics</b></span>
+      </a>
+      <nav class="main-nav">
+        <a href="#profile" data-nav="profile">Профиль игрока</a>
+        <a href="#missions" data-nav="missions">🎯 Миссии</a>
+        <a href="#progress" data-nav="progress">Мой прогресс</a>
+        <a href="#demos" data-nav="demos">AI-анализ демо</a>
+        <a href="#compare" data-nav="compare">Сравнение</a>
+        <a href="#contacts" data-nav="contacts">Контакты</a>
+      </nav>
+      <div class="auth-area" id="authArea">
+        <button class="btn btn-outline" id="btnLogin">Войти</button>
+        <button class="btn btn-primary" id="btnRegister">Регистрация</button>
+      </div>
+      <div class="user-area hidden" id="userArea">
+        <span class="user-chip" id="userChip"></span>
+        <button class="btn btn-ghost" id="btnLogout">Выйти</button>
+      </div>
+      <button class="burger" id="burger" aria-label="Меню">☰</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ======================= HERO ======================= -->
+    <section class="hero" id="home">
+      <h1>Аналитика вашего CS2-профиля<br/><span class="accent">в реальном времени</span></h1>
+      <p class="hero-sub">
+        Статистика с Faceit, AI-разбор демо-файлов нейросетью и сравнение профилей —
+        всё в одном сервисе для роста вашего уровня игры.
+      </p>
+      <div class="hero-actions">
+        <a href="#profile" class="btn btn-primary btn-lg">Найти игрока</a>
+        <a href="#demos" class="btn btn-outline btn-lg">Попробовать AI-анализ демо</a>
+      </div>
+      <div class="hero-badges">
+        <span class="badge">⚡ Мгновенная статистика</span>
+        <span class="badge">🧠 AI-анализ демо</span>
+        <span class="badge">🆓 Первый разбор бесплатно</span>
+        <span class="badge">🛡 Защита от DDoS</span>
+      </div>
+    </section>
+
+    <!-- ======================= ПРОФИЛЬ ИГРОКА ======================= -->
+    <section class="panel" id="profile">
+      <h2 class="section-title">Профиль игрока Faceit</h2>
+      <p class="section-sub">Введите ID или ник из профиля Faceit (например, <code>faceit_id: 64f2a1...</code>).</p>
+      <form class="search-form" id="profileForm">
+        <input type="text" id="playerIdInput" placeholder="Вставьте faceit_id игрока…" required />
+        <select id="gameSelect">
+          <option value="cs2">CS2</option>
+          <option value="l4d2">Left 4 Dead 2</option>
+          <option value="r6">Rainbow Six Siege</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Показать статистику</button>
+      </form>
+
+      <div id="profileResult" class="hidden">
+        <div class="profile-card" id="profileCard"></div>
+        <div class="anomaly-strip hidden" id="anomalyStrip"></div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <h3 class="sub-title">Последние матчи</h3>
+        <div class="matches-table-wrap">
+          <table class="matches-table" id="matchesTable"></table>
+        </div>
+        <h3 class="sub-title">Статистика по оружию</h3>
+        <div class="weapons-grid" id="weaponsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ======================= МИССИИ ======================= -->
+    <section class="panel" id="missions">
+      <h2 class="section-title">🎯 Еженедельные миссии</h2>
+      <p class="section-sub">
+        Выполняйте миссии — получайте очки. Очки копятся в месячном балансе и формируют
+        <b>топ-100 месяца</b>. Топ-5 получают <b>Faceit Premium</b> (авто-активация по Faceit ID).
+        Баланс сбрасывается автоматически в начале каждого месяца.
+      </p>
+
+      <div class="quota-strip" id="missionsStatus">Войдите, чтобы получать миссии</div>
+
+      <div id="missionsContent" class="hidden">
+        <div class="points-hero" id="pointsHero"></div>
+
+        <div class="missions-grid" id="missionsGrid"></div>
+
+        <div class="missions-actions">
+          <button class="btn btn-primary" id="scanWinsBtn">⚔️ Засчитать победы из истории матчей</button>
+          <span class="scan-hint" id="scanHint"></span>
+        </div>
+
+        <h3 class="sub-title">🏆 Лидерборд месяца</h3>
+        <div class="lb-controls">
+          <select id="lbMonth"></select>
+          <span class="lb-note" id="lbNote"></span>
+        </div>
+        <div class="matches-table-wrap">
+          <table class="matches-table" id="leaderboardTable"></table>
+        </div>
+
+        <div id="rewardsBox" class="hidden"></div>
+      </div>
+    </section>
+
+    <!-- ======================= ТРЕКЕР ПРОГРЕССА ======================= -->
+    <section class="panel" id="progress">
+      <h2 class="section-title">📈 Мой прогресс</h2>
+      <p class="section-sub">
+        Делайте снимки своей статистики во времени — сервис построит тренды по ключевым метрикам
+        и наложёт рейтинги из AI-анализов демо. Видно, растёте вы или нет.
+      </p>
+
+      <div class="quota-strip" id="progressStatus">Войдите, чтобы отслеживать прогресс</div>
+
+      <form class="search-form" id="snapshotForm">
+        <input type="text" id="snapFaceitId" placeholder="faceit_id (или привяжите профиль)" />
+        <button type="submit" class="btn btn-primary">📸 Сделать снимок статистики</button>
+      </form>
+
+      <div id="progressResult" class="hidden">
+        <div class="chart-grid">
+          <div class="chart-card"><h4>Win Rate %</h4><div class="chart" id="chart_win_rate"></div></div>
+          <div class="chart-card"><h4>K/D</h4><div class="chart" id="chart_kd"></div></div>
+          <div class="chart-card"><h4>Headshot %</h4><div class="chart" id="chart_hs_pct"></div></div>
+          <div class="chart-card"><h4>ADR</h4><div class="chart" id="chart_adr"></div></div>
+          <div class="chart-card chart-wide"><h4>Рейтинги AI-анализов демо (0–100)</h4><div class="chart" id="chart_demo_ratings"></div></div>
+        </div>
+        <h3 class="sub-title">История снимков</h3>
+        <div class="matches-table-wrap">
+          <table class="matches-table" id="snapshotsTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= AI АНАЛИЗ ДЕМО ======================= -->
+    <section class="panel" id="demos">
+      <h2 class="section-title">🧠 AI-анализ демо</h2>
+      <p class="section-sub">
+        Загрузите демо-файл матча (.dem) — нейросеть разберёт аим, позиционирование,
+        утилиту, экономику и клатчи, выдаст рейтинг и рекомендации.
+        <b>Первый анализ — бесплатно.</b> Далее — <span id="demoPrice">99 ₽</span> за разбор
+        (или безлимит на подписке PRO).
+      </p>
+
+      <div class="quota-strip" id="quotaStrip">
+        <span id="quotaText">Войдите, чтобы увидеть остаток бесплатных анализов</span>
+      </div>
+
+      <form class="demo-form" id="demoForm">
+        <label class="field">
+          <span>Demo-файл (.dem)</span>
+          <input type="file" id="demoFile" accept=".dem" required />
+        </label>
+        <label class="field">
+          <span>Faceit ID игрока (для контекста анализа)</span>
+          <input type="text" id="demoFaceitId" placeholder="faceit_id…" />
+        </label>
+        <label class="field">
+          <span>Карта</span>
+          <select id="demoMap">
+            <option value="de_mirage">Mirage</option>
+            <option value="de_inferno">Inferno</option>
+            <option value="de_nuke">Nuke</option>
+            <option value="de_dust2">Dust2</option>
+            <option value="de_ancient">Ancient</option>
+            <option value="de_overpass">Overpass</option>
+          </select>
+        </label>
+        <div id="paymentBox" class="payment-box hidden">
+          <p>Бесплатный лимит исчерпан. Для платного анализа подтвердите оплату:</p>
+          <input type="text" id="payToken" placeholder="Токен оплаты (из платёжного шлюза)" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" id="demoSubmitBtn">Запустить анализ</button>
+      </form>
+
+      <div id="demoLoading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>Нейросеть разбирает ваш матч… Это может занять до минуты.</p>
+      </div>
+
+      <div id="demoResult" class="hidden"></div>
+      <h3 class="sub-title" id="historyTitle" style="display:none">История ваших анализов</h3>
+      <div class="history-list" id="historyList"></div>
+    </section>
+
+    <!-- ======================= СРАВНЕНИЕ ======================= -->
+    <section class="panel" id="compare">
+      <h2 class="section-title">⚔️ Сравнение профилей</h2>
+      <p class="section-sub">Сопоставьте двух игроков по 10 ключевым метрикам — сервис покажет, кто сильнее и где именно.</p>
+      <form class="compare-form" id="compareForm">
+        <div class="compare-cols">
+          <label class="field">
+            <span>Игрок A</span>
+            <input type="text" id="cmpA" placeholder="faceit_id игрока A" required />
+          </label>
+          <div class="vs-badge">VS</div>
+          <label class="field">
+            <span>Игрок B</span>
+            <input type="text" id="cmpB" placeholder="faceit_id игрока B" required />
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Сравнить</button>
+        <button type="button" class="btn btn-outline btn-lg" id="predictBtn">🔮 Прогноз матча (A vs B)</button>
+      </form>
+      <div id="compareResult" class="hidden"></div>
+      <div id="predictResult" class="hidden"></div>
+    </section>
+
+    <!-- ======================= КОНТАКТЫ ======================= -->
+    <section class="panel" id="contacts">
+      <h2 class="section-title">✉️ Контакты</h2>
+      <div class="contacts-grid">
+        <div class="contact-info" id="contactInfo">
+          <p class="loading-mini">Загрузка контактов…</p>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <label class="field"><span>Ваше имя</span><input type="text" id="ctName" required /></label>
+          <label class="field"><span>Email</span><input type="email" id="ctEmail" required /></label>
+          <label class="field"><span>Тема</span><input type="text" id="ctSubject" /></label>
+          <label class="field"><span>Сообщение</span><textarea id="ctMessage" rows="5" required minlength="10"></textarea></label>
+          <button type="submit" class="btn btn-primary">Отправить</button>
+          <p class="form-note" id="contactNote"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================= ПОДВАЛ ======================= -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© 2026 Faceit Analytics. Не является официальным продуктом FACEIT Group.</span>
+      <span class="footer-links"><a href="#contacts">Поддержка</a> · <a href="#">Политика конфиденциальности</a></span>
+    </div>
+  </footer>
+
+  <!-- ======================= МОДАЛКА АВТОРИЗАЦИИ ======================= -->
+  <div class="modal-backdrop hidden" id="authModal">
+    <div class="modal">
+      <button class="modal-close" id="authModalClose">×</button>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Вход</button>
+        <button class="tab" data-tab="register">Регистрация</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <label class="field"><span>Email</span><input type="email" id="loginEmail" required autocomplete="email" /></label>
+        <label class="field"><span>Пароль</span><input type="password" id="loginPassword" required autocomplete="current-password" /></label>
+        <div class="captcha-box" id="loginCaptchaBox">
+          <p class="captcha-q" id="loginCaptchaQ"></p>
+          <div class="captcha-row">
+            <input type="text" id="loginCaptchaAnswer" placeholder="Ответ" />
+            <button type="button" class="btn btn-ghost btn-sm" id="captchaRefresh">↻</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Войти</button>
+        <p class="form-note error" id="loginError"></p>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden">
+        <label class="field"><span>Email</span><input type="email" id="regEmail" required autocomplete="email" /></label>
+        <label class="field"><span>Имя пользователя</span><input type="text" id="regUsername" required minlength="3" maxlength="32" /></label>
+        <label class="field"><span>Пароль (мин. 6 символов)</span><input type="password" id="regPassword" required minlength="6" autocomplete="new-password" /></label>
+        <button type="submit" class="btn btn-primary btn-lg">Создать аккаунт</button>
+        <p class="form-note error" id="regError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Тосты -->
+  <div class="toast-zone" id="toastZone"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

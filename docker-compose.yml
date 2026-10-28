@@ -1,0 +1,20 @@
+services:
+  faceit-analytics:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # ОБЯЗАТЕЛЬНО смените SECRET_KEY перед запуском в интернет!
+      # Сгенерировать: python -c "import secrets; print(secrets.token_urlsafe(48))"
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/data/faceit_analytics.db}
+      - FACEIT_API_KEY=${FACEIT_API_KEY:-}
+      - AI_API_KEY=${AI_API_KEY:-}
+      - AI_BASE_URL=${AI_BASE_URL:-}
+      - AI_MODEL=${AI_MODEL:-}
+      - DEBUG=false
+    volumes:
+      # БД и загруженные демо переживают перезапуск контейнера
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    restart: unless-stopped

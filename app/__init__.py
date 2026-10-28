@@ -1,0 +1,1 @@
+"""Faceit Analytics application package."""
